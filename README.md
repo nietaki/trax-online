@@ -3,6 +3,9 @@
 This will hopefully will turn into a Phoenix app that allows you to play 
 [Trax](https://boardgamegeek.com/boardgame/748/trax) online with a friend.
 
+
+To run the umbrella project in dev mode run `mix phx.server`
+
 ## Project goals
 
 - get warmed up with Elixir after the holiday season ;)
