@@ -3,7 +3,7 @@
 This will hopefully will turn into a Phoenix app that allows you to play 
 [Trax](https://boardgamegeek.com/boardgame/748/trax) online with a friend.
 
-To bootstrap the project run `bootstrap_brunch.sh`. It will probably spit out
+To bootstrap the project run `bootstrap.sh`. It will probably spit out
 all sorts of javascript compilation errors and get stuck in a compilation loop,
 but the second time you run `mix phx.server` everything should be ok.
 
