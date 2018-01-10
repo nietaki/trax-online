@@ -3,9 +3,8 @@
 This will hopefully will turn into a Phoenix app that allows you to play 
 [Trax](https://boardgamegeek.com/boardgame/748/trax) online with a friend.
 
-To bootstrap the project run `bootstrap.sh`. It will probably spit out
-all sorts of javascript compilation errors and get stuck in a compilation loop,
-but the second time you run `mix phx.server` everything should be ok.
+To bootstrap the project run `bootstrap.sh`. It will take care of some messy
+node/npm/brunch/elm setup.
 
 To run the umbrella project in dev mode run `mix phx.server`
 
