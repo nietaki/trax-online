@@ -1,6 +1,20 @@
 module Main exposing (..)
 
+import Array exposing (Array)
 import Html
+
+
+-- CONSTANTS
+
+
+colCount : Int
+colCount =
+    8
+
+
+rowCount : Int
+rowCount =
+    8
 
 
 main : Program Never Model Msg
@@ -13,13 +27,29 @@ main =
         }
 
 
+type FieldState
+    = On
+    | Off
+
+
+type alias BoardState =
+    Array (Array FieldState)
+
+
 type alias Model =
-    Int
+    BoardState
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( 0, Cmd.none )
+    let
+        emptyRow =
+            Array.repeat colCount Off
+
+        rows =
+            Array.repeat rowCount emptyRow
+    in
+        ( rows, Cmd.none )
 
 
 type Msg
@@ -40,4 +70,28 @@ subscriptions model =
 
 view : Model -> Html.Html Msg
 view model =
-    Html.text "hello from normal program"
+    -- Html.text "hello from normal program"
+    boardView model
+
+
+fieldView : FieldState -> Html.Html msg
+fieldView fieldState =
+    Html.td [] [ Html.text (fieldText fieldState) ]
+
+
+rowView : Array FieldState -> Html.Html msg
+rowView rowState =
+    Html.tr [] (Array.toList (Array.map fieldView rowState))
+
+
+boardView boardState =
+    Html.table [] (Array.toList (Array.map rowView boardState))
+
+
+fieldText fieldState =
+    case fieldState of
+        On ->
+            "on"
+
+        Off ->
+            "off"

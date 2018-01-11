@@ -1,1 +1,5 @@
 /* This file is for your main application css. */
+
+td {
+    border: 1px solid black;
+}
