@@ -25,6 +25,7 @@ defmodule Trax.Umbrella.Mixfile do
     [
       {:nanoid, "~> 1.0.0"},
       {:ok, "~> 1.9.4"},
+      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
     ]
   end
 end
