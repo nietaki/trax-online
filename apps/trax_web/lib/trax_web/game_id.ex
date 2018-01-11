@@ -13,5 +13,4 @@ defmodule TraxWeb.GameId do
     end
   end
 
-
 end

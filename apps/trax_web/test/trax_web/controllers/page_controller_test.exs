@@ -1,9 +1,8 @@
 defmodule TraxWeb.PageControllerTest do
   use TraxWeb.ConnCase
 
-  @tag :skip
-  test "GET /", %{conn: conn} do
+  test "/ redirects to a game index", %{conn: conn} do
     conn = get conn, "/"
-    assert html_response(conn, 200) =~ "Welcome to Phoenix!"
+    assert "/game/" <> _ = redirected_to(conn)
   end
 end
