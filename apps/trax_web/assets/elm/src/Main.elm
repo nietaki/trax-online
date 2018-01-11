@@ -70,28 +70,20 @@ subscriptions model =
 
 view : Model -> Html.Html Msg
 view model =
-    -- Html.text "hello from normal program"
     boardView model
 
 
-fieldView : FieldState -> Html.Html msg
-fieldView fieldState =
-    Html.td [] [ Html.text (fieldText fieldState) ]
+fieldView row col fieldState =
+    Html.td [] [ Html.text (fieldText row col fieldState) ]
 
 
-rowView : Array FieldState -> Html.Html msg
-rowView rowState =
-    Html.tr [] (Array.toList (Array.map fieldView rowState))
+rowView col rowState =
+    Html.tr [] (Array.toList (Array.indexedMap (fieldView col) rowState))
 
 
 boardView boardState =
-    Html.table [] (Array.toList (Array.map rowView boardState))
+    Html.table [] (Array.toList (Array.indexedMap rowView boardState))
 
 
-fieldText fieldState =
-    case fieldState of
-        On ->
-            "on"
-
-        Off ->
-            "off"
+fieldText row col fieldState =
+    (toString row) ++ " " ++ (toString col) ++ " " ++ (toString fieldState)
