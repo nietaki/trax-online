@@ -57,12 +57,12 @@ view model =
         [ Html.text <| (++) "current player: " <| toString model.currentPlayer
         , Html.br [] []
         , Html.text <| (++) "current move: " <| toString model.currentMove
-        , boardView model.board
+        , gameView model
         ]
 
 
-boardView : Board -> Html.Html Msg
-boardView boardState =
+gameView : Game -> Html.Html Msg
+gameView game =
     let
         rowIndices =
             List.range 0 (rowCount - 1)
@@ -73,19 +73,33 @@ boardView boardState =
         indices =
             cartesian rowIndices colIndices
     in
-        Html.table [] (List.map (rowView boardState) indices)
+        Html.table [] (List.map (rowView game) indices)
 
 
-rowView : Board -> List Coords -> Html.Html Msg
-rowView boardState row =
-    Html.tr [] (List.map (fieldView boardState) row)
+rowView : Game -> List Coords -> Html.Html Msg
+rowView game row =
+    Html.tr [] (List.map (fieldView game) row)
 
 
-fieldView : Board -> Coords -> Html.Html Msg
-fieldView boardState coords =
+fieldView : Game -> Coords -> Html.Html Msg
+fieldView game coords =
+    case game.currentMove of
+        Nothing ->
+            tileView (Dict.get coords game.board) (Click coords)
+
+        Just move ->
+            if move.coords == coords then
+                tileView (Just move.tile) (Click coords)
+                -- TODO fix the Msg
+            else
+                tileView (Dict.get coords game.board) (Click coords)
+
+
+tileView : Maybe Tile -> Msg -> Html.Html Msg
+tileView maybeTile onClickMessage =
     let
         ( sideClass, rotationClass ) =
-            case Dict.get coords boardState of
+            case maybeTile of
                 Nothing ->
                     ( "", "0" )
 
@@ -95,9 +109,4 @@ fieldView boardState coords =
         tileClass =
             String.toLower ("tile " ++ sideClass ++ " rotate" ++ rotationClass)
     in
-        Html.td [ onClick <| Click coords, Attributes.class tileClass ] [ Html.text (fieldText boardState coords) ]
-
-
-fieldText : Board -> Coords -> String
-fieldText boardState coords =
-    (toString coords) ++ ":  "
+        Html.td [ onClick <| onClickMessage, Attributes.class tileClass ] [ Html.text (toString onClickMessage) ]

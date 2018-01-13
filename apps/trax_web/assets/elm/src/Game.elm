@@ -94,10 +94,16 @@ type Player
     | Red
 
 
+type alias Move =
+    { coords : Coords
+    , tile : Tile
+    }
+
+
 type alias Game =
     { board : Board
     , currentPlayer : Player
-    , currentMove : Maybe Tile
+    , currentMove : Maybe Move
     }
 
 
@@ -105,7 +111,7 @@ newGame : Game
 newGame =
     { board = emptyBoard
     , currentPlayer = White
-    , currentMove = Nothing
+    , currentMove = Just { coords = ( 1, 6 ), tile = { side = Curved, rotation = R1 } }
     }
 
 
