@@ -85,10 +85,10 @@ fieldView boardState coords =
                     ( "", "0" )
 
                 Just { side, rotation } ->
-                    ( "straight", toString rotation )
+                    ( toString side, toString rotation )
 
         tileClass =
-            "tile " ++ sideClass ++ " rotate" ++ rotationClass
+            String.toLower ("tile " ++ sideClass ++ " rotate" ++ rotationClass)
     in
         Html.td [ onClick <| Click coords, Attributes.class tileClass ] [ Html.text (fieldText boardState coords) ]
 

@@ -15,17 +15,17 @@ td {
     background: url(/images/curved.png);
 }
 
-.rotateR0 {
+.rotater0 {
 }
 
-.rotateR1 {
+.rotater1 {
     transform: rotate(90deg);
 }
 
-.rotateR2 {
+.rotater2 {
     transform: rotate(180deg);
 }
 
-.rotateR3 {
+.rotater3 {
     transform: rotate(270deg);
 }

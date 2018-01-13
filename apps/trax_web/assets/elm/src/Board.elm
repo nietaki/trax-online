@@ -12,7 +12,7 @@ colCount =
 
 rowCount : Int
 rowCount =
-    5
+    8
 
 
 type TileSide
@@ -59,9 +59,12 @@ type alias Tile =
 
 nextTile : Tile -> Tile
 nextTile tile =
-    case tile of
-        { rotation, side } ->
-            { tile | rotation = nextRotation rotation }
+    case ( tile.side, tile.rotation ) of
+        ( s, R3 ) ->
+            { tile | side = otherSide s, rotation = R0 }
+
+        ( s, r ) ->
+            { tile | rotation = nextRotation r }
 
 
 type alias Coords =
@@ -92,4 +95,13 @@ cycleTile coords board =
             placeTile coords board
 
         Just tile ->
-            Dict.insert coords (nextTile tile) board
+            case ( tile.side, tile.rotation ) of
+                ( Curved, R3 ) ->
+                    Dict.remove coords board
+
+                _ ->
+                    Dict.insert coords (nextTile tile) board
+
+
+removeTile coords board =
+    Dict.remove coords board
