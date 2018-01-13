@@ -20,6 +20,15 @@ type TileSide
     | Curved
 
 
+otherSide side =
+    case side of
+        Straight ->
+            Curved
+
+        Curved ->
+            Straight
+
+
 type Rotation
     = R0
     | R1
@@ -27,10 +36,32 @@ type Rotation
     | R3
 
 
+nextRotation rotation =
+    case rotation of
+        R0 ->
+            R1
+
+        R1 ->
+            R2
+
+        R2 ->
+            R3
+
+        R3 ->
+            R0
+
+
 type alias Tile =
     { side : TileSide
     , rotation : Rotation
     }
+
+
+nextTile : Tile -> Tile
+nextTile tile =
+    case tile of
+        { rotation, side } ->
+            { tile | rotation = nextRotation rotation }
 
 
 type alias Coords =
@@ -53,3 +84,12 @@ type alias Board =
 
 placeTile coords board =
     Dict.insert coords (Tile Straight R1) board
+
+
+cycleTile coords board =
+    case Dict.get coords board of
+        Nothing ->
+            placeTile coords board
+
+        Just tile ->
+            Dict.insert coords (nextTile tile) board

@@ -43,7 +43,7 @@ update msg model =
     in
         case msg of
             Click coords ->
-                ( placeTile coords model, Cmd.none )
+                ( cycleTile coords model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
