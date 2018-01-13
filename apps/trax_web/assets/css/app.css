@@ -1,7 +1,31 @@
 /* This file is for your main application css. */
 
 td {
-    border: 1px solid black;
+    border: 2px solid gray;
     min-width: 100px; /* I hate css */
     height: 100px;
+    color: green;
+}
+
+.tile.straight {
+    background: url(/images/straight.png);
+}
+
+.tile.curved{
+    background: url(/images/curved.png);
+}
+
+.rotate0 {
+}
+
+.rotate1 {
+    transform: rotate(90deg);
+}
+
+.rotate2 {
+    transform: rotate(180deg);
+}
+
+.rotate2 {
+    transform: rotate(270deg);
 }

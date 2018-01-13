@@ -3,6 +3,7 @@ module Main exposing (..)
 import Array exposing (Array)
 import Dict exposing (Dict)
 import Html
+import Html.Attributes as Attributes
 import Html.Events exposing (onClick)
 import Maybe exposing (Maybe)
 
@@ -130,7 +131,17 @@ rowView boardState row =
 
 fieldView : BoardState -> Coords -> Html.Html Msg
 fieldView boardState coords =
-    Html.td [ onClick <| Flip coords ] [ Html.text (fieldText boardState coords) ]
+    let
+        tileType =
+            if (getWithDefault coords boardState False) then
+                "straight"
+            else
+                "curved"
+
+        tileClass =
+            "rotate1 tile " ++ tileType
+    in
+        Html.td [ onClick <| Flip coords, Attributes.class tileClass ] [ Html.text (fieldText boardState coords) ]
 
 
 fieldText : BoardState -> Coords -> String
