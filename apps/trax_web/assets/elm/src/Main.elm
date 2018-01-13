@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Array exposing (Array)
+import Dict exposing (Dict)
 import Html
 import Html.Events exposing (onClick)
 
@@ -15,7 +16,7 @@ colCount =
 
 rowCount : Int
 rowCount =
-    8
+    5
 
 
 main : Program Never Model Msg
@@ -28,9 +29,26 @@ main =
         }
 
 
-type FieldState
-    = On
-    | Off
+type alias FieldState =
+    Bool
+
+
+type alias Coords =
+    ( Int, Int )
+
+
+getRow : Coords -> Int
+getRow coords =
+    Tuple.first coords
+
+
+getCol : Coords -> Int
+getCol coords =
+    Tuple.second coords
+
+
+type alias Sth =
+    Dict Coords FieldState
 
 
 type alias RowState =
@@ -38,7 +56,7 @@ type alias RowState =
 
 
 type alias BoardState =
-    Array RowState
+    Dict Coords FieldState
 
 
 type alias Model =
@@ -47,14 +65,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    let
-        emptyRow =
-            Array.repeat colCount Off
-
-        rows =
-            Array.repeat rowCount emptyRow
-    in
-        ( rows, Cmd.none )
+    ( Dict.empty, Cmd.none )
 
 
 type Msg
@@ -69,27 +80,13 @@ update msg model =
     in
         case msg of
             Flip row col ->
-                ( flipModel row col model, Cmd.none )
+                ( model, Cmd.none )
 
 
-flipModel : Int -> Int -> BoardState -> BoardState
-flipModel row col model =
-    arrayUpdate row (flipColumn col) model
 
-
-flipColumn : Int -> RowState -> RowState
-flipColumn col rowState =
-    arrayUpdate col flipField rowState
-
-
-flipField : FieldState -> FieldState
-flipField fieldState =
-    case fieldState of
-        Off ->
-            On
-
-        On ->
-            Off
+-- ( flipModel row col model, Cmd.none )
+-- flipModel : Coords -> BoardState -> BoardState
+-- flipModel coords model =
 
 
 subscriptions : Model -> Sub Msg
@@ -102,24 +99,32 @@ view model =
     boardView model
 
 
-fieldView : Int -> Int -> FieldState -> Html.Html Msg
-fieldView row col fieldState =
-    Html.td [ onClick <| Flip row col ] [ Html.text (fieldText row col fieldState) ]
-
-
-rowView : Int -> RowState -> Html.Html Msg
-rowView col rowState =
-    Html.tr [] (Array.toList (Array.indexedMap (fieldView col) rowState))
-
-
 boardView : BoardState -> Html.Html Msg
 boardView boardState =
-    Html.table [] (Array.toList (Array.indexedMap rowView boardState))
+    let
+        rowIndices =
+            List.range 0 (rowCount - 1)
+
+        colIndices =
+            List.range 0 (colCount - 1)
+
+        indices =
+            cartesian rowIndices colIndices
+    in
+        Html.table [] (List.map (rowView boardState) indices)
 
 
-fieldText : a -> b -> c -> String
-fieldText row col fieldState =
-    (toString row) ++ " " ++ (toString col) ++ " " ++ (toString fieldState)
+rowView boardState row =
+    Html.tr [] (List.map (fieldView boardState) row)
+
+
+fieldView boardState coords =
+    Html.td [ onClick <| Flip (getRow coords) (getCol coords) ] [ Html.text (fieldText boardState coords) ]
+
+
+fieldText : BoardState -> Coords -> String
+fieldText boardState coords =
+    (toString coords) ++ " " ++ (toString (Dict.get coords boardState))
 
 
 
@@ -138,3 +143,16 @@ arrayUpdate index fun array =
 
             Nothing ->
                 array
+
+
+cartesian : List a -> List b -> List (List ( a, b ))
+cartesian xs ys =
+    let
+        tuplize a ls =
+            List.map (makeTuple a) ls
+    in
+        List.map (\x -> tuplize x ys) xs
+
+
+makeTuple a b =
+    ( a, b )
