@@ -1,4 +1,4 @@
-module Board exposing (..)
+module Game exposing (..)
 
 import Dict exposing (Dict)
 import Helpers exposing (..)
@@ -85,8 +85,37 @@ type alias Board =
     Dict Coords Tile
 
 
+emptyBoard =
+    Dict.empty
+
+
+type Player
+    = White
+    | Red
+
+
+type alias Game =
+    { board : Board
+    , currentPlayer : Player
+    , currentMove : Maybe Tile
+    }
+
+
+newGame : Game
+newGame =
+    { board = emptyBoard
+    , currentPlayer = White
+    , currentMove = Nothing
+    }
+
+
+boardAction : (Board -> Board) -> Game -> Game
+boardAction action game =
+    { game | board = action game.board }
+
+
 placeTile coords board =
-    Dict.insert coords (Tile Straight R1) board
+    Dict.insert coords (Tile Straight R0) board
 
 
 cycleTile coords board =

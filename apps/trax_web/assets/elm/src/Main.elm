@@ -1,7 +1,7 @@
 module Main exposing (..)
 
-import Board exposing (..)
 import Dict exposing (Dict)
+import Game exposing (..)
 import Helpers exposing (..)
 
 
@@ -23,12 +23,12 @@ main =
 
 
 type alias Model =
-    Board
+    Game
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Dict.empty, Cmd.none )
+    ( newGame, Cmd.none )
 
 
 type Msg
@@ -43,7 +43,7 @@ update msg model =
     in
         case msg of
             Click coords ->
-                ( cycleTile coords model, Cmd.none )
+                ( boardAction (cycleTile coords) model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -53,7 +53,12 @@ subscriptions model =
 
 view : Model -> Html.Html Msg
 view model =
-    boardView model
+    Html.div []
+        [ Html.text <| (++) "current player: " <| toString model.currentPlayer
+        , Html.br [] []
+        , Html.text <| (++) "current move: " <| toString model.currentMove
+        , boardView model.board
+        ]
 
 
 boardView : Board -> Html.Html Msg
