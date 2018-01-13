@@ -32,7 +32,8 @@ init =
 
 
 type Msg
-    = Click Coords
+    = Nop
+    | TryMove Coords
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -42,8 +43,11 @@ update msg model =
             Debug.log "incoming message" msg
     in
         case msg of
-            Click coords ->
+            TryMove coords ->
                 ( boardAction (cycleTile coords) model, Cmd.none )
+
+            Nop ->
+                ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -85,28 +89,28 @@ fieldView : Game -> Coords -> Html.Html Msg
 fieldView game coords =
     case game.currentMove of
         Nothing ->
-            tileView (Dict.get coords game.board) (Click coords)
+            tileView (Dict.get coords game.board) (TryMove coords)
 
         Just move ->
             if move.coords == coords then
-                tileView (Just move.tile) (Click coords)
+                tileView (Just move.tile) (TryMove coords)
                 -- TODO fix the Msg
             else
-                tileView (Dict.get coords game.board) (Click coords)
+                tileView (Dict.get coords game.board) (TryMove coords)
 
 
 tileView : Maybe Tile -> Msg -> Html.Html Msg
 tileView maybeTile onClickMessage =
     let
-        ( sideClass, rotationClass ) =
+        ( sideClass, rotation ) =
             case maybeTile of
                 Nothing ->
-                    ( "", "0" )
+                    ( "", R0 )
 
                 Just { side, rotation } ->
-                    ( toString side, toString rotation )
+                    ( toString side, rotation )
 
         tileClass =
-            String.toLower ("tile " ++ sideClass ++ " rotate" ++ rotationClass)
+            String.toLower ("tile " ++ sideClass ++ " rotate" ++ (toString rotation))
     in
         Html.td [ onClick <| onClickMessage, Attributes.class tileClass ] [ Html.text (toString onClickMessage) ]

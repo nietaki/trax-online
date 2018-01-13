@@ -94,6 +94,15 @@ type Player
     | Red
 
 
+nextPlayer player =
+    case player of
+        White ->
+            Red
+
+        Red ->
+            White
+
+
 type alias Move =
     { coords : Coords
     , tile : Tile
@@ -140,3 +149,15 @@ cycleTile coords board =
 
 removeTile coords board =
     Dict.remove coords board
+
+
+tryMove : Coords -> Game -> Game
+tryMove coords game =
+    case Dict.get coords game.board of
+        Just _ ->
+            -- already occupied
+            game
+
+        Nothing ->
+            --
+            game
