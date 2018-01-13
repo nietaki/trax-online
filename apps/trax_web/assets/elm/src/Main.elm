@@ -4,6 +4,7 @@ import Array exposing (Array)
 import Dict exposing (Dict)
 import Html
 import Html.Events exposing (onClick)
+import Maybe exposing (Maybe)
 
 
 -- CONSTANTS
@@ -69,7 +70,7 @@ init =
 
 
 type Msg
-    = Flip Int Int
+    = Flip Coords
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -79,14 +80,22 @@ update msg model =
             Debug.log "incoming message" msg
     in
         case msg of
-            Flip row col ->
-                ( model, Cmd.none )
+            Flip coords ->
+                ( flipModel coords model, Cmd.none )
 
 
+flipModel : Coords -> BoardState -> BoardState
+flipModel coords model =
+    let
+        currentFieldState =
+            getWithDefault coords model False
+    in
+        Dict.insert coords (flipFieldState currentFieldState) model
 
--- ( flipModel row col model, Cmd.none )
--- flipModel : Coords -> BoardState -> BoardState
--- flipModel coords model =
+
+flipFieldState : FieldState -> FieldState
+flipFieldState state =
+    not state
 
 
 subscriptions : Model -> Sub Msg
@@ -114,12 +123,14 @@ boardView boardState =
         Html.table [] (List.map (rowView boardState) indices)
 
 
+rowView : BoardState -> List Coords -> Html.Html Msg
 rowView boardState row =
     Html.tr [] (List.map (fieldView boardState) row)
 
 
+fieldView : BoardState -> Coords -> Html.Html Msg
 fieldView boardState coords =
-    Html.td [ onClick <| Flip (getRow coords) (getCol coords) ] [ Html.text (fieldText boardState coords) ]
+    Html.td [ onClick <| Flip coords ] [ Html.text (fieldText boardState coords) ]
 
 
 fieldText : BoardState -> Coords -> String
@@ -154,5 +165,16 @@ cartesian xs ys =
         List.map (\x -> tuplize x ys) xs
 
 
+makeTuple : a -> b -> ( a, b )
 makeTuple a b =
     ( a, b )
+
+
+getWithDefault : comparable -> Dict comparable a -> a -> a
+getWithDefault key dictionary default =
+    case Dict.get key dictionary of
+        Nothing ->
+            default
+
+        Just a ->
+            a
