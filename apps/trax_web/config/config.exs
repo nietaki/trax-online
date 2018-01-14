@@ -7,7 +7,8 @@ use Mix.Config
 
 # General application configuration
 config :trax_web,
-  namespace: TraxWeb
+  namespace: TraxWeb,
+  websocket_port: 8666
 
 # Configures the endpoint
 config :trax_web, TraxWeb.Endpoint,

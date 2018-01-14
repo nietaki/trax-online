@@ -10,6 +10,10 @@ defmodule TraxWeb.Application do
       supervisor(TraxWeb.Endpoint, []),
       # Start your own worker by calling: TraxWeb.Worker.start_link(arg1, arg2, arg3)
       # worker(TraxWeb.Worker, [arg1, arg2, arg3]),
+
+      # listener is started this way to make sure all the handlers infrastructure is
+      # ready before any connections get accepted
+      worker(TraxWeb.GameWebsocketListener, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
