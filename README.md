@@ -16,7 +16,7 @@ To run the umbrella project in dev mode run `mix phx.server`
 - create a MVP for playing Trax online
 - get Trax out my head ;)
 
-## Non goals (eye on the prize)
+## Non goals (eyes on the prize)
 
 - good web UI (layout, look & feel)
 - any authentication whatsoever
