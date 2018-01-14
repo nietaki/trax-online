@@ -44,7 +44,7 @@ update msg model =
     in
         case msg of
             TryMove coords ->
-                ( boardAction (cycleTile coords) model, Cmd.none )
+                ( tryMove coords model, Cmd.none )
 
             Nop ->
                 ( model, Cmd.none )

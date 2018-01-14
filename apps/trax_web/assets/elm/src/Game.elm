@@ -61,7 +61,7 @@ nextTile : Tile -> Tile
 nextTile tile =
     case ( tile.side, tile.rotation ) of
         ( s, R3 ) ->
-            { tile | side = otherSide s, rotation = R0 }
+            { side = otherSide s, rotation = R0 }
 
         ( s, r ) ->
             { tile | rotation = nextRotation r }
@@ -116,6 +116,11 @@ type alias Game =
     }
 
 
+defaultTile : Tile
+defaultTile =
+    { side = Curved, rotation = R0 }
+
+
 newGame : Game
 newGame =
     { board = emptyBoard
@@ -129,28 +134,6 @@ boardAction action game =
     { game | board = action game.board }
 
 
-placeTile coords board =
-    Dict.insert coords (Tile Straight R0) board
-
-
-cycleTile coords board =
-    case Dict.get coords board of
-        Nothing ->
-            placeTile coords board
-
-        Just tile ->
-            case ( tile.side, tile.rotation ) of
-                ( Curved, R3 ) ->
-                    Dict.remove coords board
-
-                _ ->
-                    Dict.insert coords (nextTile tile) board
-
-
-removeTile coords board =
-    Dict.remove coords board
-
-
 tryMove : Coords -> Game -> Game
 tryMove coords game =
     case Dict.get coords game.board of
@@ -160,4 +143,17 @@ tryMove coords game =
 
         Nothing ->
             --
-            game
+            updateCurrentMove coords game
+
+
+updateCurrentMove : Coords -> Game -> Game
+updateCurrentMove coords game =
+    case game.currentMove of
+        Nothing ->
+            { game | currentMove = Just { coords = coords, tile = defaultTile } }
+
+        Just move ->
+            if move.coords == coords then
+                { game | currentMove = Just { coords = coords, tile = nextTile move.tile } }
+            else
+                { game | currentMove = Just { coords = coords, tile = defaultTile } }
