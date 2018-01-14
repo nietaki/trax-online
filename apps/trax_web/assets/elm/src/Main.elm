@@ -34,6 +34,7 @@ init =
 type Msg
     = Nop
     | TryMove Coords
+    | CommitMove
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -49,6 +50,9 @@ update msg model =
             Nop ->
                 ( model, Cmd.none )
 
+            CommitMove ->
+                ( commitMove model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -61,6 +65,9 @@ view model =
         [ Html.text <| (++) "current player: " <| toString model.currentPlayer
         , Html.br [] []
         , Html.text <| (++) "current move: " <| toString model.currentMove
+        , Html.br [] []
+        , Html.button [ onClick CommitMove ] [ Html.text "commit the move!" ]
+        , Html.br [] []
         , gameView model
         ]
 
@@ -94,7 +101,7 @@ fieldView game coords =
         Just move ->
             if move.coords == coords then
                 tileView (Just move.tile) (TryMove coords)
-                -- TODO fix the Msg
+                -- TODO fix the fact that already placed tiles are clickable
             else
                 tileView (Dict.get coords game.board) (TryMove coords)
 
@@ -113,4 +120,4 @@ tileView maybeTile onClickMessage =
         tileClass =
             String.toLower ("tile " ++ sideClass ++ " rotate" ++ (toString rotation))
     in
-        Html.td [ onClick <| onClickMessage, Attributes.class tileClass ] [ Html.text (toString onClickMessage) ]
+        Html.td [ onClick <| onClickMessage, Attributes.class tileClass ] [ Html.text "" ]

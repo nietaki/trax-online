@@ -60,8 +60,11 @@ type alias Tile =
 nextTile : Tile -> Tile
 nextTile tile =
     case ( tile.side, tile.rotation ) of
-        ( s, R3 ) ->
-            { side = otherSide s, rotation = R0 }
+        ( Curved, R3 ) ->
+            { side = Straight, rotation = R0 }
+
+        ( Straight, R1 ) ->
+            { side = Curved, rotation = R0 }
 
         ( s, r ) ->
             { tile | rotation = nextRotation r }
@@ -157,3 +160,17 @@ updateCurrentMove coords game =
                 { game | currentMove = Just { coords = coords, tile = nextTile move.tile } }
             else
                 { game | currentMove = Just { coords = coords, tile = defaultTile } }
+
+
+commitMove : Game -> Game
+commitMove game =
+    case game.currentMove of
+        Nothing ->
+            game
+
+        Just move ->
+            let
+                newBoard =
+                    Dict.insert move.coords move.tile game.board
+            in
+                { game | board = newBoard, currentPlayer = nextPlayer game.currentPlayer, currentMove = Nothing }
