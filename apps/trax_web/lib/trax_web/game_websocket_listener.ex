@@ -1,6 +1,8 @@
 defmodule TraxWeb.GameWebsocketListener do
   use GenServer
 
+  require OK
+
   alias __MODULE__, as: This
 
   def start_link() do
@@ -19,11 +21,12 @@ defmodule TraxWeb.GameWebsocketListener do
       transport_opts = [port: port]
       protocol_opts = [env: [dispatch: dispatch_config]]
 
-      with {:ok, _pid} <- :cowboy.start_http(:http, acceptor_count, transport_opts, protocol_opts)
-      do
+      OK.try do
+        _pid <- :cowboy.start_http(:http, acceptor_count, transport_opts, protocol_opts)
+      after
         {:ok, :state}
-      else
-        err -> {:stop, {:could_not_start_cowboy, err}}
+      rescue
+        cowboy_err -> {:stop, {:could_not_start_cowboy, cowboy_err}}
       end
     else
       {:stop, :websocket_port_missing_in_config}
