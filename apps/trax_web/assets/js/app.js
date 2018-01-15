@@ -11,7 +11,7 @@
 //
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
-import "phoenix_html"
+import "phoenix_html";
 
 // Import local files
 //
@@ -22,5 +22,10 @@ import "phoenix_html"
 
 const elmDiv = document.getElementById('elm-main');
 if (elmDiv) {
-    Elm.Main.embed(elmDiv);
+    var hostname = window.location.hostname;
+    var gameId = window.location.pathname; // TODO split out the game id
+    Elm.Main.embed(elmDiv, {
+        hostname: hostname,
+        gameId: gameId
+    });
 }

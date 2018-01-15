@@ -12,9 +12,9 @@ import Html.Attributes as Attributes
 import Html.Events exposing (onClick)
 
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , view = view
         , update = update
@@ -26,8 +26,14 @@ type alias Model =
     Game
 
 
-init : ( Model, Cmd Msg )
-init =
+type alias Flags =
+    { hostname : String
+    , gameId : String
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     ( newGame, Cmd.none )
 
 
