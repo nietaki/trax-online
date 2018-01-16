@@ -23,7 +23,7 @@ import "phoenix_html";
 const elmDiv = document.getElementById('elm-main');
 if (elmDiv) {
     var hostname = window.location.hostname;
-    var gameId = window.location.pathname; // TODO split out the game id
+    var gameId = window.location.pathname.split("/").reverse()[0];
     Elm.Main.embed(elmDiv, {
         hostname: hostname,
         gameId: gameId

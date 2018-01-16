@@ -23,7 +23,9 @@ main =
 
 
 type alias Model =
-    Game
+    { flags : Flags
+    , game : Game
+    }
 
 
 type alias Flags =
@@ -34,7 +36,7 @@ type alias Flags =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( newGame, Cmd.none )
+    ( Model flags newGame, Cmd.none )
 
 
 type Msg
@@ -51,13 +53,13 @@ update msg model =
     in
         case msg of
             TryMove coords ->
-                ( tryMove coords model, Cmd.none )
+                ( gameApply (tryMove coords) model, Cmd.none )
 
             Nop ->
                 ( model, Cmd.none )
 
             CommitMove ->
-                ( commitMove model, Cmd.none )
+                ( gameApply commitMove model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -68,13 +70,15 @@ subscriptions model =
 view : Model -> Html.Html Msg
 view model =
     Html.div []
-        [ Html.text <| (++) "current player: " <| toString model.currentPlayer
+        [ Html.text <| (++) "flags: " <| toString model.flags
         , Html.br [] []
-        , Html.text <| (++) "current move: " <| toString model.currentMove
+        , Html.text <| (++) "current player: " <| toString model.game.currentPlayer
+        , Html.br [] []
+        , Html.text <| (++) "current move: " <| toString model.game.currentMove
         , Html.br [] []
         , Html.button [ onClick CommitMove ] [ Html.text "commit the move!" ]
         , Html.br [] []
-        , gameView model
+        , gameView model.game
         ]
 
 
@@ -127,3 +131,12 @@ tileView maybeTile onClickMessage =
             String.toLower ("tile " ++ sideClass ++ " rotate" ++ (toString rotation))
     in
         Html.td [ onClick <| onClickMessage, Attributes.class tileClass ] [ Html.text "" ]
+
+
+
+-- HELPERS
+
+
+gameApply : (Game -> Game) -> Model -> Model
+gameApply f model =
+    { model | game = f model.game }
