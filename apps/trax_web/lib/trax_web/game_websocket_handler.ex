@@ -38,7 +38,7 @@ defmodule TraxWeb.GameWebsocketHandler do
   #===========================================================================
 
   def websocket_handle({:text, content}, req, state) do
-    info(req, "handling #{content}")
+    info(req, "handling \"#{content}\"")
     reply = "cowboy replying to '#{content}'!"
     {:reply, {:text, reply}, req, state}
   end

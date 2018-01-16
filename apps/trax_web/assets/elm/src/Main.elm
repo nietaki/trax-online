@@ -10,6 +10,7 @@ import Helpers exposing (..)
 import Html
 import Html.Attributes as Attributes
 import Html.Events exposing (onClick)
+import WebSocket
 
 
 main : Program Flags Model Msg
@@ -43,6 +44,7 @@ type Msg
     = Nop
     | TryMove Coords
     | CommitMove
+    | WebSocketInput String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -59,12 +61,15 @@ update msg model =
                 ( model, Cmd.none )
 
             CommitMove ->
-                ( gameApply commitMove model, Cmd.none )
+                ( gameApply commitMove model, WebSocket.send (websocketUrl model) (toString model) )
+
+            WebSocketInput str ->
+                ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    WebSocket.listen (websocketUrl model) WebSocketInput
 
 
 view : Model -> Html.Html Msg
@@ -140,3 +145,12 @@ tileView maybeTile onClickMessage =
 gameApply : (Game -> Game) -> Model -> Model
 gameApply f model =
     { model | game = f model.game }
+
+
+websocketUrl : Model -> String
+websocketUrl model =
+    let
+        url =
+            "ws://" ++ model.flags.hostname ++ ":8666/websocket/" ++ model.flags.gameId
+    in
+        url
