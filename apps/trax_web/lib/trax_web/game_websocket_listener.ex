@@ -39,7 +39,7 @@ defmodule TraxWeb.GameWebsocketListener do
       {
         :_,
         [
-          {"/websocket", TraxWeb.GameWebsocketHandler, []}
+          {"/websocket/:game_id", TraxWeb.GameWebsocketHandler, []}
         ]
       }
     ])

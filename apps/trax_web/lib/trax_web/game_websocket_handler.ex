@@ -22,6 +22,7 @@ defmodule TraxWeb.GameWebsocketHandler do
 
   def websocket_init(_transport_name, req, _opts) do
     info(req, "connected")
+    _game_id = get_game_id(req)
     {:ok, req, :undefined_state }
   end
 
@@ -54,6 +55,10 @@ defmodule TraxWeb.GameWebsocketHandler do
 
   defp get_path(req) do
     req |> Tuple.to_list() |> Enum.at(11)
+  end
+
+  defp get_game_id(req) do
+    req |> Tuple.to_list() |> Enum.at(15) |> Keyword.fetch!(:game_id)
   end
 
 
