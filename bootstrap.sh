@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# set -x
+set -x
 
 ROOT_DIR=`dirname "$0"`
 
@@ -8,6 +8,8 @@ pushd $ROOT_DIR
 mix deps.get
 mix compile
 popd
+
+rm -rf $ROOT_DIR/apps/trax_web/assets/elm/elm-stuff/
 
 pushd $ROOT_DIR/apps/trax_web/assets/
 npm install
