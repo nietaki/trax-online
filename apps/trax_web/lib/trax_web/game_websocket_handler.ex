@@ -22,7 +22,8 @@ defmodule TraxWeb.GameWebsocketHandler do
 
   def websocket_init(_transport_name, req, _opts) do
     info(req, "connected")
-    _game_id = get_game_id(req)
+    game_id = get_game_id(req)
+    Trax.GameSupervisor.start_server(game_id)
     {:ok, req, :undefined_state }
   end
 
