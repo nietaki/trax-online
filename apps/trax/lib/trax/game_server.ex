@@ -4,6 +4,7 @@ defmodule Trax.GameServer do
   @impl true
   def init([game_id]) do
     IO.puts "starting game server #{game_id}"
+    {:ok, _} = Registry.register(Trax.GameRegistry, :foo, :bar)
     {:ok, game_id}
   end
 

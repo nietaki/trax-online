@@ -13,7 +13,8 @@ defmodule Trax.Application do
     import Supervisor.Spec, warn: false
 
     Supervisor.start_link([
-      {DynamicSupervisor, strategy: :one_for_one, name: Trax.GameSupervisor}
-    ], strategy: :one_for_one, name: Trax.Supervisor)
+      {Registry, name: Trax.GameRegistry, keys: :unique},
+      {DynamicSupervisor, strategy: :one_for_one, name: Trax.GameSupervisor},
+    ], strategy: :one_for_all, name: Trax.Supervisor)
   end
 end
