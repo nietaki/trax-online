@@ -1,6 +1,9 @@
 defmodule TraxWeb.GameWebsocketHandler do
   @behaviour :cowboy_websocket_handler
 
+  alias Trax.GameServer
+
+  alias __MODULE__, as: This
   require Logger
 
   @moduledoc """
@@ -10,6 +13,12 @@ defmodule TraxWeb.GameWebsocketHandler do
   See here for the weirdly formatted docs:
   https://ninenines.eu/docs/en/cowboy/1.0/manual/cowboy_websocket_handler/
   """
+
+  defstruct [
+    :game_id,
+    :server_pid,
+    :websocket_id,
+  ]
 
   #===========================================================================
   # One-time callbacks
@@ -23,8 +32,16 @@ defmodule TraxWeb.GameWebsocketHandler do
   def websocket_init(_transport_name, req, _opts) do
     info(req, "connected")
     game_id = get_game_id(req)
-    Trax.GameSupervisor.start_server(game_id)
-    {:ok, req, :undefined_state }
+    websocket_id = Nanoid.generate()
+    {:ok, server_pid} = Trax.GameSupervisor.lazy_start_server(game_id)
+    state = %This{
+      game_id: game_id,
+      server_pid: server_pid,
+      websocket_id: websocket_id,
+    }
+    GameServer.register_participant(server_pid, websocket_id)
+    # TODO monitor the game server and suicide if it dies
+    {:ok, req, state}
   end
 
 
