@@ -39,14 +39,16 @@ defmodule TraxWeb.GameWebsocketHandler do
       server_pid: server_pid,
       websocket_id: websocket_id,
     }
-    GameServer.register_participant(server_pid, websocket_id)
+    GameServer.add_participant(server_pid, websocket_id)
     # TODO monitor the game server and suicide if it dies
     {:ok, req, state}
   end
 
 
-  def websocket_terminate(reason, req, _state) do
+  def websocket_terminate(reason, req, state) do
+    %This{server_pid: server_pid, websocket_id: websocket_id} = state
     info(req, "disconnected with reason #{inspect(reason)}")
+    GameServer.remove_participant(server_pid, websocket_id)
     :ok
   end
 
@@ -56,8 +58,11 @@ defmodule TraxWeb.GameWebsocketHandler do
   #===========================================================================
 
   def websocket_handle({:text, content}, req, state) do
+    %This{server_pid: server_pid, websocket_id: websocket_id} = state
     info(req, "handling \"#{content}\"")
-    reply = "cowboy replying to '#{content}'!"
+    {:ok, reply} = GameServer.perform_action(server_pid, websocket_id, content)
+    reply = Poison.encode!(reply)
+    Logger.info("websocket replying with #{reply}")
     {:reply, {:text, reply}, req, state}
   end
 

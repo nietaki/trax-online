@@ -35,7 +35,9 @@ defmodule Trax.Mixfile do
   #
   # Type `mix help deps` for examples and options.
   defp deps do
-    []
+    [
+      {:poison, "~> 3.1"},
+    ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

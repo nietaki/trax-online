@@ -1,23 +1,25 @@
 defmodule Trax.GameServer do
+  use GenServer
+
   require Logger
 
-  use GenServer
+  alias Trax.GameLogic
 
   defmodule State do
     defstruct [
       :game_id,
+      :game_state,
       :participants,
     ]
 
+
     def new(game_id) do
+      {:ok, game_state} = GameLogic.init(game_id)
       %__MODULE__{
         game_id: game_id,
+        game_state: game_state,
         participants: %{},
       }
-    end
-
-    def add_participant(state = %__MODULE__{participants: participants}, websocket_id, websocket_pid) do
-      %__MODULE__{state | participants: Map.put(participants, websocket_id, websocket_pid)}
     end
   end
 
@@ -40,8 +42,19 @@ defmodule Trax.GameServer do
   # Public Interface
   #---------------------------------------------------------------------------
 
-  def register_participant(game_server_pid, websocket_id) do
-    GenServer.cast(game_server_pid, {:register_participant, websocket_id, self()})
+  def add_participant(game_server_pid, websocket_id) do
+    GenServer.cast(game_server_pid, {:add_participant, websocket_id, self()})
+  end
+
+
+  def remove_participant(game_server_pid, websocket_id) do
+    GenServer.cast(game_server_pid, {:remove_participant, websocket_id})
+  end
+
+
+  def perform_action(game_server_pid, websocket_id, action) do
+    game_state = GenServer.call(game_server_pid, {:perform_action, websocket_id, action})
+    {:ok, game_state}
   end
 
   #---------------------------------------------------------------------------
@@ -49,10 +62,28 @@ defmodule Trax.GameServer do
   #---------------------------------------------------------------------------
 
   @impl true
-  def handle_cast({:register_participant, websocket_id, websocket_pid}, state) do
+  def handle_cast({:add_participant, websocket_id, websocket_pid}, state) do
     Logger.info "adding #{websocket_id} as a participant in #{state.game_id}"
-    new_state = State.add_participant(state, websocket_id, websocket_pid)
+    new_participants = Map.put(state.participants, websocket_id, websocket_pid)
+    {:ok, game_state} = GameLogic.add_participant(state.game_state, websocket_id)
+    new_state = %State{state | participants: new_participants, game_state: game_state}
     {:noreply, new_state}
+  end
+
+  @impl true
+  def handle_cast({:remove_participant, websocket_id}, state) do
+    Logger.info "removing #{websocket_id} from participants in #{state.game_id}"
+    participants = Map.delete(state.participants, websocket_id)
+    {:ok, game_state} = GameLogic.remove_participant(state.game_state, websocket_id)
+    new_state = %State{state | participants: participants, game_state: game_state}
+    {:noreply, new_state}
+  end
+
+
+  @impl true
+  def handle_call({:perform_action, websocket_id, action}, _from, state) do
+    {:ok, game_state} = GameLogic.perform_action(state.game_state, websocket_id, action)
+    {:reply, game_state, %{state | game_state: game_state}}
   end
 
 end
