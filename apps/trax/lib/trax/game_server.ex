@@ -83,7 +83,21 @@ defmodule Trax.GameServer do
   @impl true
   def handle_call({:perform_action, websocket_id, action}, _from, state) do
     {:ok, game_state} = GameLogic.perform_action(state.game_state, websocket_id, action)
-    {:reply, game_state, %{state | game_state: game_state}}
+    new_state = %{state | game_state: game_state}
+    :ok = broadcast({:send_out, Poison.encode!(game_state)}, new_state)
+    {:reply, game_state, new_state}
+  end
+
+  #===========================================================================
+  # Private Functions
+  #===========================================================================
+
+  # broadcasts the message to all in-game websockets
+  def broadcast(message, state) do
+    state.participants
+    |> Enum.map(fn {_id, pid} -> pid end)
+    |> Enum.each(fn pid -> send(pid, message) end)
+    :ok
   end
 
 end

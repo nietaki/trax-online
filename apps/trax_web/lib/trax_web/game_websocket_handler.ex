@@ -67,8 +67,13 @@ defmodule TraxWeb.GameWebsocketHandler do
   end
 
 
+  def websocket_info({:send_out, frame}, req, state) do
+    info(req, "sending out #{inspect frame}")
+    {:reply, {:text, frame}, req, state}
+  end
+
   def websocket_info(info, req, state) do
-    info(req, "received info #{inspect info}")
+    info(req, "received unexpected info #{inspect info}")
     {:ok, req, state}
   end
 
