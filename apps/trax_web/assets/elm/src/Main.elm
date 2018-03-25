@@ -112,8 +112,6 @@ view model =
     Html.div []
         [ Html.text <| (++) "flags: " <| toString model.flags
         , Html.br [] []
-        , Html.text <| (++) "current player: " <| toString model.game.currentPlayer
-        , Html.br [] []
         , Html.text <| (++) "current move: " <| toString model.game.currentMove
         , Html.br [] []
         , Html.button [ onClick CommitMove ] [ Html.text "commit the move!" ]

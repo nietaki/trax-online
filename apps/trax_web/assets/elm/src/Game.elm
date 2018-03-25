@@ -92,20 +92,6 @@ emptyBoard =
     Dict.empty
 
 
-type Player
-    = White
-    | Red
-
-
-nextPlayer player =
-    case player of
-        White ->
-            Red
-
-        Red ->
-            White
-
-
 type alias Move =
     { coords : Coords
     , tile : Tile
@@ -114,7 +100,6 @@ type alias Move =
 
 type alias Game =
     { board : Board
-    , currentPlayer : Player
     , currentMove : Maybe Move
     }
 
@@ -127,7 +112,6 @@ defaultTile =
 newGame : Game
 newGame =
     { board = emptyBoard
-    , currentPlayer = White
     , currentMove = Just { coords = ( 1, 6 ), tile = { side = Curved, rotation = R1 } }
     }
 
@@ -173,4 +157,4 @@ commitMove game =
                 newBoard =
                     Dict.insert move.coords move.tile game.board
             in
-                { game | board = newBoard, currentPlayer = nextPlayer game.currentPlayer, currentMove = Nothing }
+                { game | board = newBoard, currentMove = Nothing }
