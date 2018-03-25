@@ -10,6 +10,7 @@ import Helpers exposing (..)
 import Html
 import Html.Attributes as Attributes
 import Html.Events exposing (onClick)
+import Json.Decode as JD
 import WebSocket
 
 
@@ -64,8 +65,41 @@ update msg model =
                 -- ( gameApply commitMove model, WebSocket.send (websocketUrl model) (toString model) )
                 ( gameApply commitMove model, WebSocket.send (websocketUrl model) "[\"make_move\", {}, {}]" )
 
+            -- ( gameApply commitMove model, WebSocket.send (websocketUrl model) "{\"type\": \"foo\", \"data\": {}, \"metadata\": {}}" )
             WebSocketInput str ->
-                ( model, Cmd.none )
+                ( handleWebsocketInput model str, Cmd.none )
+
+
+type IncomingWebsocketMessage
+    = Foo
+
+
+decodeIncomingMessage : String -> Maybe IncomingWebsocketMessage
+decodeIncomingMessage input =
+    let
+        messageType =
+            JD.decodeString (JD.index 0 JD.string) input
+    in
+        case messageType of
+            Ok "foo" ->
+                Just Foo
+
+            _ ->
+                Nothing
+
+
+handleWebsocketInput : Model -> String -> Model
+handleWebsocketInput model input =
+    let
+        decodedMessage =
+            decodeIncomingMessage input
+
+        _ =
+            Debug.log
+                "decoded websocket messsage"
+                decodedMessage
+    in
+        model
 
 
 subscriptions : Model -> Sub Msg
