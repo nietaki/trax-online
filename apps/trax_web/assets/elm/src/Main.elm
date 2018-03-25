@@ -27,6 +27,8 @@ main =
 type alias Model =
     { flags : Flags
     , game : Game
+
+    -- TODO: add self player id, participants, current player
     }
 
 
@@ -144,18 +146,18 @@ fieldView : Game -> Coords -> Html.Html Msg
 fieldView game coords =
     case game.currentMove of
         Nothing ->
-            tileView (Dict.get coords game.board) (TryMove coords)
+            tileView (Dict.get coords game.board) (TryMove coords) False
 
         Just move ->
             if move.coords == coords then
-                tileView (Just move.tile) (TryMove coords)
+                tileView (Just move.tile) (TryMove coords) True
                 -- TODO fix the fact that already placed tiles are clickable
             else
-                tileView (Dict.get coords game.board) (TryMove coords)
+                tileView (Dict.get coords game.board) (TryMove coords) False
 
 
-tileView : Maybe Tile -> Msg -> Html.Html Msg
-tileView maybeTile onClickMessage =
+tileView : Maybe Tile -> Msg -> Bool -> Html.Html Msg
+tileView maybeTile onClickMessage isCurrent =
     let
         ( sideClass, rotation ) =
             case maybeTile of
@@ -167,8 +169,14 @@ tileView maybeTile onClickMessage =
 
         tileClass =
             String.toLower ("tile " ++ sideClass ++ " rotate" ++ (toString rotation))
+
+        currentClass =
+            if isCurrent then
+                " current"
+            else
+                ""
     in
-        Html.td [ onClick <| onClickMessage, Attributes.class tileClass ] [ Html.text "" ]
+        Html.td [ onClick <| onClickMessage, Attributes.class (tileClass ++ currentClass) ] [ Html.text "" ]
 
 
 

@@ -8,11 +8,11 @@ td {
 }
 
 .tile.straight {
-    background: url(/images/straight.png);
+    background-image: url(/images/straight.png);
 }
 
 .tile.curved{
-    background: url(/images/curved.png);
+    background-image: url(/images/curved.png);
 }
 
 .rotater0 {
@@ -28,4 +28,9 @@ td {
 
 .rotater3 {
     transform: rotate(270deg);
+}
+
+.current {
+    background-color: hsla(0,0%,100%,0.30);
+    background-blend-mode: overlay;
 }
