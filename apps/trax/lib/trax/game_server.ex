@@ -4,6 +4,7 @@ defmodule Trax.GameServer do
   require Logger
 
   alias Trax.GameLogic
+  alias Trax.Message
 
   defmodule State do
     defstruct [
@@ -52,8 +53,8 @@ defmodule Trax.GameServer do
   end
 
 
-  def perform_action(game_server_pid, websocket_id, action) do
-    game_state = GenServer.call(game_server_pid, {:perform_action, websocket_id, action})
+  def perform_action(game_server_pid, websocket_id, message = %Message{}) do
+    game_state = GenServer.call(game_server_pid, {:perform_action, websocket_id, message})
     {:ok, game_state}
   end
 
@@ -81,10 +82,11 @@ defmodule Trax.GameServer do
 
 
   @impl true
-  def handle_call({:perform_action, websocket_id, action}, _from, state) do
-    {:ok, game_state} = GameLogic.perform_action(state.game_state, websocket_id, action)
+  def handle_call({:perform_action, websocket_id, message}, _from, state) do
+    {:ok, game_state} = GameLogic.perform_action(state.game_state, websocket_id, message)
     new_state = %{state | game_state: game_state}
-    :ok = broadcast({:send_out, Poison.encode!(game_state)}, new_state)
+    broadcast_msg = %Message{type: "foo", data: %{foo: :bar}, metadata: %{}}
+    :ok = broadcast({:send_out, broadcast_msg}, new_state)
     {:reply, game_state, new_state}
   end
 

@@ -2,6 +2,7 @@ defmodule TraxWeb.GameWebsocketHandler do
   @behaviour :cowboy_websocket_handler
 
   alias Trax.GameServer
+  alias Trax.Message
 
   alias __MODULE__, as: This
   require Logger
@@ -60,15 +61,21 @@ defmodule TraxWeb.GameWebsocketHandler do
   def websocket_handle({:text, content}, req, state) do
     %This{server_pid: server_pid, websocket_id: websocket_id} = state
     info(req, "handling \"#{content}\"")
-    {:ok, reply} = GameServer.perform_action(server_pid, websocket_id, content)
-    reply = Poison.encode!(reply)
-    Logger.info("websocket replying with #{reply}")
-    {:reply, {:text, reply}, req, state}
+    with {:ok, message} <- Message.parse(content),
+         {:ok, _reply} <- GameServer.perform_action(server_pid, websocket_id, message)
+    do
+      Logger.info("message accepted: \"#{content}\"")
+      {:ok, req, state}
+    else
+      _other ->
+        Logger.warn("invalid message sent from client: \"#{content}\"")
+        {:ok, req, state}
+    end
   end
 
-
-  def websocket_info({:send_out, frame}, req, state) do
-    info(req, "sending out #{inspect frame}")
+  def websocket_info({:send_out, message = %Message{}}, req, state) do
+    info(req, "sending out #{inspect message}")
+    {:ok, frame} = Message.encode(message)
     {:reply, {:text, frame}, req, state}
   end
 

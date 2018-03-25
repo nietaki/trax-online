@@ -61,7 +61,8 @@ update msg model =
                 ( model, Cmd.none )
 
             CommitMove ->
-                ( gameApply commitMove model, WebSocket.send (websocketUrl model) (toString model) )
+                -- ( gameApply commitMove model, WebSocket.send (websocketUrl model) (toString model) )
+                ( gameApply commitMove model, WebSocket.send (websocketUrl model) "[\"make_move\", {}, {}]" )
 
             WebSocketInput str ->
                 ( model, Cmd.none )
